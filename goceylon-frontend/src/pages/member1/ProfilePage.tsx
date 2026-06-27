@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import api from '../../api/axios';
 import { User, ApiResponse } from '../../types';
+import ConfirmDialog from '../../components/common/ConfirmDialog';
 
 /**
  * ============================================
@@ -11,7 +12,7 @@ import { User, ApiResponse } from '../../types';
  * ============================================
  */
 export default function ProfilePage() {
-  const { user, fetchProfile, userProfile, logout } = useAuth();
+  const { logout } = useAuth();
   const navigate = useNavigate();
   const [profile, setProfile] = useState<User | null>(null);
   const [editing, setEditing] = useState(false);
@@ -20,10 +21,9 @@ export default function ProfilePage() {
   const [error, setError] = useState('');
   const [pwForm, setPwForm] = useState({ currentPassword: '', newPassword: '' });
   const [pwMsg, setPwMsg] = useState('');
+  const [dialog, setDialog] = useState<'signout' | 'delete' | null>(null);
 
-  useEffect(() => {
-    loadProfile();
-  }, []);
+  useEffect(() => { loadProfile(); }, []);
 
   const loadProfile = async () => {
     try {
@@ -45,7 +45,7 @@ export default function ProfilePage() {
       const res = await api.put<ApiResponse<User>>('/users/profile', form);
       setProfile(res.data.data);
       setEditing(false);
-      setMsg('Profile updated successfully!');
+      setMsg('Profile updated.');
     } catch (err: any) {
       setError(err.response?.data?.message || 'Update failed');
     }
@@ -56,7 +56,7 @@ export default function ProfilePage() {
     setPwMsg('');
     try {
       await api.put('/users/password', pwForm);
-      setPwMsg('Password changed successfully!');
+      setPwMsg('success');
       setPwForm({ currentPassword: '', newPassword: '' });
     } catch (err: any) {
       setPwMsg(err.response?.data?.message || 'Password change failed');
@@ -65,137 +65,216 @@ export default function ProfilePage() {
 
   const handleDeleteAccount = async () => {
     if (!profile) return;
-    if (!window.confirm('Are you strictly sure you want to deactivate your account? This cannot be undone.')) return;
+    setDialog(null);
     try {
       await api.delete(`/users/${profile.id}`);
-      logout();
-      navigate('/');
+      logout(); navigate('/');
     } catch (err: any) {
       setError(err.response?.data?.message || 'Failed to delete account');
     }
   };
 
+  const inp = "w-full px-4 py-2.5 rounded-xl border border-gray-300 bg-gray-100 text-gray-900 text-sm placeholder-gray-400 outline-none focus:border-primary focus:ring-2 focus:ring-primary/10 transition-all";
+
   if (!profile) return (
-    <div className="min-h-screen flex items-center justify-center">
-      <div className="w-8 h-8 border-2 border-primary-light border-t-transparent rounded-full animate-spin" />
+    <div className="min-h-screen flex items-center justify-center bg-white">
+      <div className="w-7 h-7 border-2 border-primary border-t-transparent rounded-full animate-spin" />
     </div>
   );
 
   return (
-    <div className="min-h-screen pt-24 pb-12 px-4">
-      <div className="max-w-3xl mx-auto space-y-6">
-        <h1 className="text-3xl font-bold">My Profile</h1>
+    <div className="min-h-screen bg-white">
 
-        {/* Profile Card */}
-        <div className="p-8 rounded-2xl bg-surface-light border border-white/5">
-          <div className="flex items-center gap-5 mb-6">
-            <div className="w-20 h-20 rounded-full bg-gradient-to-br from-primary to-primary-light flex items-center justify-center text-3xl font-bold">
-              {profile.firstName[0]}
-            </div>
-            <div>
-              <h2 className="text-xl font-bold">{profile.firstName} {profile.lastName}</h2>
-              <p className="text-text-secondary">{profile.email}</p>
-              <div className="flex gap-2 mt-2">
-                <span className="px-2 py-0.5 text-xs rounded-full bg-primary/10 text-primary-light">{profile.role}</span>
-                {profile.isVerified && <span className="px-2 py-0.5 text-xs rounded-full bg-success/10 text-success">Verified</span>}
+      {/* ── Dialogs ── */}
+      {dialog === 'signout' && (
+        <ConfirmDialog
+          title="Sign out?"
+          description="You'll need to sign in again to access your account."
+          confirmLabel="Sign out"
+          onCancel={() => setDialog(null)}
+          onConfirm={() => { setDialog(null); logout(); navigate('/'); }}
+        />
+      )}
+      {dialog === 'delete' && (
+        <ConfirmDialog
+          title="Delete your account?"
+          description="This will permanently delete your account and all associated data. This action cannot be undone."
+          confirmLabel="Delete account"
+          danger
+          onCancel={() => setDialog(null)}
+          onConfirm={handleDeleteAccount}
+        />
+      )}
+
+      <div className="max-w-5xl mx-auto px-8 pt-28 pb-20">
+
+        {/* Page header */}
+        <div className="mb-10">
+          <h1 className="text-3xl font-bold text-gray-900">Account</h1>
+          <p className="text-gray-400 text-sm mt-1">{profile.email}</p>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-[280px_1fr] gap-8 items-start">
+
+          {/* ── Left: Identity sidebar ── */}
+          <div className="lg:sticky lg:top-28 space-y-4">
+            <div className="p-6 rounded-2xl border border-gray-100 bg-gray-50">
+              <div className="w-16 h-16 rounded-2xl bg-primary flex items-center justify-center text-2xl font-bold text-white mb-4">
+                {profile.firstName[0]}
+              </div>
+              <p className="font-semibold text-gray-900">{profile.firstName} {profile.lastName}</p>
+              <p className="text-sm text-gray-400 mt-0.5 mb-3">{profile.email}</p>
+              <div className="flex flex-wrap gap-1.5">
+                <span className="px-2.5 py-1 text-[11px] rounded-full bg-primary/10 text-primary font-semibold">
+                  {profile.role}
+                </span>
+                {profile.isVerified && (
+                  <span className="px-2.5 py-1 text-[11px] rounded-full bg-green-100 text-success font-semibold">
+                    Verified
+                  </span>
+                )}
+              </div>
+              <div className="mt-4 pt-4 border-t border-gray-200">
+                <p className="text-xs text-gray-400">Member since</p>
+                <p className="text-sm text-gray-700 font-medium mt-0.5">
+                  {new Date(profile.createdAt).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
+                </p>
               </div>
             </div>
+
+            <button onClick={() => setDialog('signout')}
+              className="w-full py-2.5 rounded-xl border border-gray-200 text-sm text-gray-500 hover:border-gray-300 hover:text-gray-900 transition-all">
+              Sign out
+            </button>
           </div>
 
-          {msg && <div className="p-3 mb-4 rounded-lg bg-success/10 border border-success/20 text-success text-sm">{msg}</div>}
-          {error && <div className="p-3 mb-4 rounded-lg bg-danger/10 border border-danger/20 text-danger text-sm">{error}</div>}
+          {/* ── Right: Content ── */}
+          <div className="space-y-5">
 
-          {editing ? (
-            <form onSubmit={handleUpdate} className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-text-secondary mb-1">First Name</label>
-                  <input type="text" value={form.firstName} onChange={e => setForm({ ...form, firstName: e.target.value })}
-                    className="w-full px-4 py-2.5 rounded-lg bg-surface border border-white/10 text-white outline-none focus:border-primary-light transition-all" />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-text-secondary mb-1">Last Name</label>
-                  <input type="text" value={form.lastName} onChange={e => setForm({ ...form, lastName: e.target.value })}
-                    className="w-full px-4 py-2.5 rounded-lg bg-surface border border-white/10 text-white outline-none focus:border-primary-light transition-all" />
-                </div>
+            {/* Personal info */}
+            <section className="rounded-2xl border border-gray-100 overflow-hidden">
+              <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+                <h2 className="text-sm font-semibold text-gray-900">Personal Information</h2>
+                {!editing && (
+                  <button onClick={() => setEditing(true)}
+                    className="text-xs font-medium text-primary hover:underline">
+                    Edit
+                  </button>
+                )}
               </div>
-              <div>
-                <label className="block text-sm font-medium text-text-secondary mb-1">Phone</label>
-                <input type="tel" value={form.phone} onChange={e => setForm({ ...form, phone: e.target.value })}
-                  className="w-full px-4 py-2.5 rounded-lg bg-surface border border-white/10 text-white outline-none focus:border-primary-light transition-all" />
+
+              <div className="p-6">
+                {msg   && <div className="px-4 py-3 mb-4 rounded-xl bg-green-50 border border-green-100 text-success text-sm">{msg}</div>}
+                {error && <div className="px-4 py-3 mb-4 rounded-xl bg-red-50 border border-red-100 text-danger text-sm">{error}</div>}
+
+                {editing ? (
+                  <form onSubmit={handleUpdate} className="space-y-4">
+                    <div className="grid grid-cols-2 gap-4">
+                      <Field label="First Name">
+                        <input type="text" value={form.firstName} onChange={e => setForm({ ...form, firstName: e.target.value })} className={inp} />
+                      </Field>
+                      <Field label="Last Name">
+                        <input type="text" value={form.lastName} onChange={e => setForm({ ...form, lastName: e.target.value })} className={inp} />
+                      </Field>
+                    </div>
+                    <Field label="Phone">
+                      <input type="tel" value={form.phone} onChange={e => setForm({ ...form, phone: e.target.value })} className={inp} placeholder="07X XXX XXXX" />
+                    </Field>
+                    <Field label="Bio">
+                      <textarea value={form.bio} onChange={e => setForm({ ...form, bio: e.target.value })} rows={3} className={inp + ' resize-none'} placeholder="Tell us about yourself..." />
+                    </Field>
+                    <div className="flex gap-2 pt-1">
+                      <button type="submit" className="px-5 py-2 rounded-xl bg-gray-900 text-white text-sm font-semibold hover:bg-gray-700 transition-all">
+                        Save changes
+                      </button>
+                      <button type="button" onClick={() => setEditing(false)}
+                        className="px-5 py-2 rounded-xl border border-gray-200 text-gray-500 text-sm hover:bg-gray-50 transition-all">
+                        Cancel
+                      </button>
+                    </div>
+                  </form>
+                ) : (
+                  <div className="divide-y divide-gray-50">
+                    <InfoRow label="Name">{profile.firstName} {profile.lastName}</InfoRow>
+                    <InfoRow label="Phone">{profile.phone || <Blank />}</InfoRow>
+                    <InfoRow label="Bio">{profile.bio || <Blank />}</InfoRow>
+                  </div>
+                )}
               </div>
-              <div>
-                <label className="block text-sm font-medium text-text-secondary mb-1">Bio</label>
-                <textarea value={form.bio} onChange={e => setForm({ ...form, bio: e.target.value })} rows={3}
-                  className="w-full px-4 py-2.5 rounded-lg bg-surface border border-white/10 text-white outline-none focus:border-primary-light transition-all resize-none" />
+            </section>
+
+            {/* Security */}
+            <section className="rounded-2xl border border-gray-100 overflow-hidden">
+              <div className="px-6 py-4 border-b border-gray-100">
+                <h2 className="text-sm font-semibold text-gray-900">Security</h2>
               </div>
-              <div className="flex gap-3">
-                <button type="submit" className="px-6 py-2 rounded-lg bg-gradient-to-r from-primary to-primary-light text-white font-medium hover:shadow-lg transition-all">
-                  Save Changes
+              <div className="p-6">
+                {pwMsg === 'success' && (
+                  <div className="px-4 py-3 mb-4 rounded-xl bg-green-50 border border-green-100 text-success text-sm">Password updated successfully.</div>
+                )}
+                {pwMsg && pwMsg !== 'success' && (
+                  <div className="px-4 py-3 mb-4 rounded-xl bg-red-50 border border-red-100 text-danger text-sm">{pwMsg}</div>
+                )}
+                <form onSubmit={handlePasswordChange} className="space-y-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <Field label="Current Password">
+                      <input type="password" required value={pwForm.currentPassword}
+                        onChange={e => setPwForm({ ...pwForm, currentPassword: e.target.value })}
+                        className={inp} placeholder="••••••••" />
+                    </Field>
+                    <Field label="New Password">
+                      <input type="password" required value={pwForm.newPassword}
+                        onChange={e => setPwForm({ ...pwForm, newPassword: e.target.value })}
+                        className={inp} placeholder="Min 8 chars, use @ ! $ % &" />
+                    </Field>
+                  </div>
+                  <button type="submit"
+                    className="px-5 py-2 rounded-xl border border-gray-200 text-gray-700 text-sm font-medium hover:border-gray-300 hover:bg-gray-50 transition-all">
+                    Update password
+                  </button>
+                </form>
+              </div>
+            </section>
+
+            {/* Danger zone */}
+            <section className="rounded-2xl border border-red-100 overflow-hidden">
+              <div className="px-6 py-4 border-b border-red-100">
+                <h2 className="text-sm font-semibold text-danger">Danger Zone</h2>
+              </div>
+              <div className="p-6 flex items-center justify-between gap-6">
+                <p className="text-sm text-gray-400">Permanently delete your account and all associated data.</p>
+                <button onClick={() => setDialog('delete')}
+                  className="shrink-0 px-5 py-2 rounded-xl border border-red-200 text-danger text-sm font-medium hover:bg-red-50 transition-all">
+                  Delete account
                 </button>
-                <button type="button" onClick={() => setEditing(false)}
-                  className="px-6 py-2 rounded-lg border border-white/10 text-text-secondary hover:text-white transition-all">
-                  Cancel
-                </button>
               </div>
-            </form>
-          ) : (
-            <div className="space-y-3">
-              <div className="flex justify-between">
-                <span className="text-text-secondary">Phone:</span>
-                <span>{profile.phone || 'Not set'}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-text-secondary">Bio:</span>
-                <span className="text-right max-w-xs">{profile.bio || 'Not set'}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-text-secondary">Member since:</span>
-                <span>{new Date(profile.createdAt).toLocaleDateString()}</span>
-              </div>
-              <button onClick={() => setEditing(true)}
-                className="mt-4 px-6 py-2 rounded-lg bg-gradient-to-r from-primary to-primary-light text-white font-medium hover:shadow-lg transition-all">
-                Edit Profile
-              </button>
-            </div>
-          )}
-        </div>
+            </section>
 
-        {/* Change Password */}
-        <div className="p-8 rounded-2xl bg-surface-light border border-white/5">
-          <h3 className="text-lg font-semibold mb-4">Change Password</h3>
-          {pwMsg && <div className="p-3 mb-4 rounded-lg bg-primary/10 border border-primary/20 text-primary-light text-sm">{pwMsg}</div>}
-          <form onSubmit={handlePasswordChange} className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-text-secondary mb-1">Current Password</label>
-              <input type="password" required value={pwForm.currentPassword}
-                onChange={e => setPwForm({ ...pwForm, currentPassword: e.target.value })}
-                className="w-full px-4 py-2.5 rounded-lg bg-surface border border-white/10 text-white outline-none focus:border-primary-light transition-all" />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-text-secondary mb-1">New Password</label>
-              <input type="password" required value={pwForm.newPassword}
-                onChange={e => setPwForm({ ...pwForm, newPassword: e.target.value })}
-                className="w-full px-4 py-2.5 rounded-lg bg-surface border border-white/10 text-white outline-none focus:border-primary-light transition-all"
-                placeholder="Min 8 chars, uppercase, lowercase, digit, special" />
-            </div>
-            <button type="submit"
-              className="px-6 py-2 rounded-lg border border-white/10 text-text-secondary hover:text-white hover:border-primary-light transition-all">
-              Update Password
-            </button>
-          </form>
-        </div>
-
-        {/* Delete Account */}
-        <div className="p-8 rounded-2xl bg-danger/5 border border-danger/10">
-          <h3 className="text-lg font-semibold text-danger mb-2">Danger Zone</h3>
-          <p className="text-sm text-text-secondary mb-4">Once you delete your account, there is no going back. Please be certain.</p>
-          <button onClick={handleDeleteAccount}
-            className="px-6 py-2 rounded-lg bg-danger/10 text-danger font-medium hover:bg-danger/20 transition-all border border-danger/20">
-            Delete Account
-          </button>
+          </div>
         </div>
       </div>
     </div>
   );
+}
+
+function Field({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <div>
+      <label className="block text-xs font-medium text-gray-500 mb-1.5">{label}</label>
+      {children}
+    </div>
+  );
+}
+
+function InfoRow({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <div className="flex items-start justify-between py-3 gap-6">
+      <span className="text-sm text-gray-400 shrink-0 w-24">{label}</span>
+      <span className="text-sm text-gray-900 text-right">{children}</span>
+    </div>
+  );
+}
+
+function Blank() {
+  return <span className="text-gray-300">—</span>;
 }
