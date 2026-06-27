@@ -9,6 +9,13 @@ import { Activity, ApiResponse, CATEGORIES, CATEGORY_LABELS } from '../../types'
  * Student ID: IT24103420
  * ============================================
  */
+const CATEGORY_EMOJI: Record<string, string> = {
+  CULTURAL: '🎭', ADVENTURE: '🏔️', CULINARY: '🍲', NATURE: '🌿',
+  CRAFT: '🎨', WELLNESS: '🧘', WATER_SPORTS: '🏄', WILDLIFE: '🐘', HERITAGE: '🏛️',
+};
+
+const CARD_BG = ['bg-orange-50', 'bg-sky-50', 'bg-emerald-50', 'bg-violet-50', 'bg-amber-50', 'bg-rose-50'];
+
 export default function ActivitiesPage() {
   const [activities, setActivities] = useState<Activity[]>([]);
   const [loading, setLoading] = useState(true);
@@ -25,64 +32,61 @@ export default function ActivitiesPage() {
   }, [selectedCategory]);
 
   return (
-    <div className="min-h-screen pt-24 pb-12 px-4">
-      <div className="max-w-7xl mx-auto">
+    <div className="min-h-screen bg-gray-50">
+      <div className="max-w-6xl mx-auto px-8 pt-28 pb-16">
+
+        {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold mb-2">Explore Activities</h1>
-          <p className="text-text-secondary">Discover authentic Sri Lankan experiences offered by local communities</p>
+          <p className="text-[11px] font-bold uppercase tracking-widest text-primary mb-2">Browse</p>
+          <h1 className="text-3xl font-bold text-gray-900">Explore Activities</h1>
+          <p className="text-gray-400 mt-1.5 text-sm">Discover authentic Sri Lankan experiences from local communities</p>
         </div>
 
         {/* Category Filters */}
         <div className="flex flex-wrap gap-2 mb-8">
-          <button onClick={() => setSearchParams({})}
-            className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 ${
-              !selectedCategory ? 'bg-primary text-white' : 'bg-surface-light text-text-secondary hover:text-white border border-white/10'
-            }`}>All</button>
+          <FilterPill active={!selectedCategory} onClick={() => setSearchParams({})}>All</FilterPill>
           {CATEGORIES.map(cat => (
-            <button key={cat} onClick={() => setSearchParams({ category: cat })}
-              className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 ${
-                selectedCategory === cat ? 'bg-primary text-white' : 'bg-surface-light text-text-secondary hover:text-white border border-white/10'
-              }`}>{CATEGORY_LABELS[cat]}</button>
+            <FilterPill key={cat} active={selectedCategory === cat} onClick={() => setSearchParams({ category: cat })}>
+              {CATEGORY_EMOJI[cat]} {CATEGORY_LABELS[cat]}
+            </FilterPill>
           ))}
         </div>
 
         {loading ? (
-          <div className="flex justify-center py-20">
-            <div className="w-8 h-8 border-2 border-primary-light border-t-transparent rounded-full animate-spin" />
+          <div className="flex justify-center py-24">
+            <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
           </div>
         ) : activities.length === 0 ? (
-          <div className="text-center py-20">
+          <div className="text-center py-24">
             <div className="text-5xl mb-4">🏝️</div>
-            <h3 className="text-xl font-semibold mb-2">No activities found</h3>
-            <p className="text-text-secondary">Check back later or try a different category</p>
+            <h3 className="text-lg font-semibold mb-1 text-gray-900">No activities found</h3>
+            <p className="text-gray-400 text-sm">Try a different category or check back later</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {activities.map(a => (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+            {activities.map((a, i) => (
               <Link key={a.id} to={`/activities/${a.id}`}
-                className="group rounded-2xl bg-surface-card border border-white/5 overflow-hidden hover:border-primary/30
-                         transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-primary/10">
-                <div className="h-48 bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center relative">
-                  <span className="text-6xl">{
-                    a.category === 'CULTURAL' ? '🎭' : a.category === 'ADVENTURE' ? '🏔️' :
-                    a.category === 'CULINARY' ? '🍲' : a.category === 'NATURE' ? '🌿' :
-                    a.category === 'CRAFT' ? '🎨' : a.category === 'WATER_SPORTS' ? '🏄' : '🌴'
-                  }</span>
-                  <div className="absolute top-3 right-3 px-2 py-1 rounded-full bg-black/40 backdrop-blur-sm text-xs text-white">
+                className="group bg-white rounded-2xl border border-gray-200 overflow-hidden hover:shadow-[0_8px_32px_rgba(0,0,0,0.08)] hover:-translate-y-0.5 transition-all duration-300">
+                <div className={`h-44 flex items-center justify-center text-5xl relative ${CARD_BG[i % CARD_BG.length]}`}>
+                  <span>{CATEGORY_EMOJI[a.category] || '🌴'}</span>
+                  <div className="absolute top-3 left-3 px-2.5 py-1 rounded-full bg-white/90 text-xs font-semibold text-gray-700 shadow-sm backdrop-blur-sm">
                     {CATEGORY_LABELS[a.category] || a.category}
                   </div>
-                </div>
-                <div className="p-5">
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-sm text-text-secondary">by {a.providerName}</span>
-                    <span className="text-lg font-bold text-secondary">${a.price}</span>
+                  <div className="absolute top-3 right-3 px-2.5 py-1 rounded-full bg-white/90 text-xs font-bold text-secondary shadow-sm backdrop-blur-sm">
+                    ${a.price}
                   </div>
-                  <h3 className="font-semibold text-lg mb-1 group-hover:text-primary-light transition-colors">{a.title}</h3>
-                  <p className="text-text-secondary text-sm line-clamp-2 mb-3">{a.description}</p>
-                  <div className="flex items-center gap-3 text-xs text-text-secondary">
+                </div>
+                <div className="p-4">
+                  <h3 className="font-semibold text-gray-900 mb-1 group-hover:text-primary transition-colors line-clamp-1">
+                    {a.title}
+                  </h3>
+                  <p className="text-gray-400 text-sm line-clamp-2 mb-3">{a.description}</p>
+                  <div className="flex items-center justify-between text-xs text-gray-400">
                     <span>📍 {a.locationName || 'Sri Lanka'}</span>
-                    {a.durationHours && <span>⏱ {a.durationHours}h</span>}
-                    {a.maxParticipants && <span>👥 Max {a.maxParticipants}</span>}
+                    <div className="flex items-center gap-2">
+                      {a.durationHours && <span>⏱ {a.durationHours}h</span>}
+                      <span className="text-gray-300">by {a.providerName}</span>
+                    </div>
                   </div>
                 </div>
               </Link>
@@ -91,5 +95,18 @@ export default function ActivitiesPage() {
         )}
       </div>
     </div>
+  );
+}
+
+function FilterPill({ active, onClick, children }: { active: boolean; onClick: () => void; children: React.ReactNode }) {
+  return (
+    <button onClick={onClick}
+      className={`px-4 py-1.5 rounded-full text-sm font-medium transition-all duration-200 ${
+        active
+          ? 'bg-primary text-white shadow-sm'
+          : 'bg-white text-gray-500 border border-gray-200 hover:border-gray-300 hover:text-gray-900'
+      }`}>
+      {children}
+    </button>
   );
 }

@@ -50,44 +50,46 @@ export default function FavoritesPage() {
     try { await api.delete(`/itineraries/${id}`); setItineraries(itineraries.filter(i => i.id !== id)); } catch {}
   };
 
+  const inputClass = "w-full px-4 py-2.5 rounded-lg bg-white border border-gray-300 text-gray-900 placeholder-gray-400 outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all";
+
   return (
-    <div className="min-h-screen pt-24 pb-12 px-4">
+    <div className="min-h-screen pt-24 pb-12 px-4 bg-gray-50">
       <div className="max-w-4xl mx-auto">
-        <h1 className="text-3xl font-bold mb-6">My Collection</h1>
+        <h1 className="text-3xl font-bold mb-6 text-gray-900">My Collection</h1>
 
         {/* Tabs */}
-        <div className="flex gap-1 p-1 rounded-xl bg-surface-light border border-white/5 mb-8 max-w-xs">
+        <div className="flex gap-1 p-1 rounded-xl bg-white border border-gray-200 shadow-sm mb-8 max-w-xs">
           {(['favorites', 'itineraries'] as const).map(t => (
             <button key={t} onClick={() => setTab(t)}
               className={`flex-1 py-2 px-4 rounded-lg text-sm font-medium transition-all ${
-                tab === t ? 'bg-primary text-white' : 'text-text-secondary hover:text-white'
+                tab === t ? 'bg-primary text-white' : 'text-gray-500 hover:text-gray-900'
               }`}>{t === 'favorites' ? '❤️ Favorites' : '📋 Itineraries'}</button>
           ))}
         </div>
 
         {loading ? (
           <div className="flex justify-center py-20">
-            <div className="w-8 h-8 border-2 border-primary-light border-t-transparent rounded-full animate-spin" />
+            <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
           </div>
         ) : tab === 'favorites' ? (
           favorites.length === 0 ? (
             <div className="text-center py-16">
               <div className="text-5xl mb-4">❤️</div>
-              <p className="text-text-secondary">No favorites yet. Explore activities and save your favorites!</p>
-              <Link to="/activities" className="inline-block mt-4 text-primary-light hover:underline">Browse Activities</Link>
+              <p className="text-gray-500">No favorites yet. Explore activities and save your favorites!</p>
+              <Link to="/activities" className="inline-block mt-4 text-primary hover:underline font-medium">Browse Activities</Link>
             </div>
           ) : (
             <div className="space-y-3">
               {favorites.map(f => (
-                <div key={f.id} className="p-4 rounded-xl bg-surface-light border border-white/5 flex items-center justify-between">
+                <div key={f.id} className="p-4 rounded-xl bg-white border border-gray-200 shadow-sm flex items-center justify-between">
                   <div>
                     <div className="flex items-center gap-2">
-                      <span className="text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary-light">{f.favoriteType}</span>
-                      <span className="font-medium">{f.activityTitle || f.locationName || 'Saved Location'}</span>
+                      <span className="text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary font-medium">{f.favoriteType}</span>
+                      <span className="font-medium text-gray-900">{f.activityTitle || f.locationName || 'Saved Location'}</span>
                     </div>
-                    {f.latitude && <p className="text-xs text-text-secondary mt-1">📍 {f.latitude}, {f.longitude}</p>}
+                    {f.latitude && <p className="text-xs text-gray-400 mt-1">📍 {f.latitude}, {f.longitude}</p>}
                   </div>
-                  <button onClick={() => removeFavorite(f.id)} className="text-danger hover:text-danger/80 text-sm transition-colors">Remove</button>
+                  <button onClick={() => removeFavorite(f.id)} className="text-danger hover:text-red-700 text-sm transition-colors">Remove</button>
                 </div>
               ))}
             </div>
@@ -95,46 +97,44 @@ export default function FavoritesPage() {
         ) : (
           <div>
             <button onClick={() => setShowForm(!showForm)}
-              className="mb-6 px-5 py-2 rounded-lg bg-gradient-to-r from-primary to-primary-light text-white font-medium hover:shadow-lg transition-all">
+              className="mb-6 px-5 py-2 rounded-lg bg-primary text-white font-medium hover:bg-primary-dark transition-all">
               + New Itinerary
             </button>
 
             {showForm && (
-              <form onSubmit={createItinerary} className="p-6 rounded-2xl bg-surface-light border border-white/5 mb-6 space-y-4">
+              <form onSubmit={createItinerary} className="p-6 rounded-2xl bg-white border border-gray-200 shadow-sm mb-6 space-y-4">
                 <input type="text" required value={newItinerary.title} onChange={e => setNewItinerary({ ...newItinerary, title: e.target.value })}
-                  className="w-full px-4 py-2.5 rounded-lg bg-surface border border-white/10 text-white outline-none focus:border-primary-light transition-all"
-                  placeholder="Itinerary title" />
+                  className={inputClass} placeholder="Itinerary title" />
                 <textarea value={newItinerary.description} onChange={e => setNewItinerary({ ...newItinerary, description: e.target.value })}
-                  className="w-full px-4 py-2.5 rounded-lg bg-surface border border-white/10 text-white outline-none focus:border-primary-light transition-all resize-none" rows={2}
-                  placeholder="Description (optional)" />
+                  className={inputClass + ' resize-none'} rows={2} placeholder="Description (optional)" />
                 <div className="grid grid-cols-2 gap-4">
                   <input type="date" value={newItinerary.startDate} onChange={e => setNewItinerary({ ...newItinerary, startDate: e.target.value })}
-                    className="px-4 py-2.5 rounded-lg bg-surface border border-white/10 text-white outline-none focus:border-primary-light transition-all" />
+                    className={inputClass} />
                   <input type="date" value={newItinerary.endDate} onChange={e => setNewItinerary({ ...newItinerary, endDate: e.target.value })}
-                    className="px-4 py-2.5 rounded-lg bg-surface border border-white/10 text-white outline-none focus:border-primary-light transition-all" />
+                    className={inputClass} />
                 </div>
-                <button type="submit" className="px-6 py-2 rounded-lg bg-primary text-white font-medium hover:bg-primary-light transition-all">Create</button>
+                <button type="submit" className="px-6 py-2 rounded-lg bg-primary text-white font-medium hover:bg-primary-dark transition-all">Create</button>
               </form>
             )}
 
             {itineraries.length === 0 ? (
-              <div className="text-center py-16"><div className="text-5xl mb-4">📋</div><p className="text-text-secondary">No itineraries yet</p></div>
+              <div className="text-center py-16"><div className="text-5xl mb-4">📋</div><p className="text-gray-500">No itineraries yet</p></div>
             ) : (
               <div className="space-y-4">
                 {itineraries.map(it => (
-                  <div key={it.id} className="p-5 rounded-2xl bg-surface-light border border-white/5">
+                  <div key={it.id} className="p-5 rounded-2xl bg-white border border-gray-200 shadow-sm">
                     <div className="flex items-start justify-between">
                       <div>
                         <Link to={`/itineraries/${it.id}`} className="block group">
-                          <h3 className="font-semibold text-lg group-hover:text-primary-light transition-colors">{it.title}</h3>
-                          {it.description && <p className="text-text-secondary text-sm mt-1">{it.description}</p>}
-                          <div className="flex gap-4 mt-2 text-xs text-text-secondary">
+                          <h3 className="font-semibold text-lg text-gray-900 group-hover:text-primary transition-colors">{it.title}</h3>
+                          {it.description && <p className="text-gray-500 text-sm mt-1">{it.description}</p>}
+                          <div className="flex gap-4 mt-2 text-xs text-gray-400">
                             {it.startDate && <span>📅 {it.startDate} → {it.endDate}</span>}
                             <span>{it.items.length} items</span>
                           </div>
                         </Link>
                       </div>
-                      <button onClick={() => deleteItinerary(it.id)} className="text-danger hover:text-danger/80 text-sm">Delete</button>
+                      <button onClick={() => deleteItinerary(it.id)} className="text-danger hover:text-red-700 text-sm">Delete</button>
                     </div>
                   </div>
                 ))}

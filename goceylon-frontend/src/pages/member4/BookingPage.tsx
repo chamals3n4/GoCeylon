@@ -43,27 +43,33 @@ export default function BookingPage() {
     } finally { setLoading(false); }
   };
 
-  if (!activity) return <div className="min-h-screen flex items-center justify-center"><div className="w-8 h-8 border-2 border-primary-light border-t-transparent rounded-full animate-spin" /></div>;
+  const inputClass = "w-full px-4 py-2.5 rounded-lg bg-white border border-gray-300 text-gray-900 outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all";
+
+  if (!activity) return (
+    <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+    </div>
+  );
 
   if (success) return (
-    <div className="min-h-screen pt-24 pb-12 px-4">
+    <div className="min-h-screen pt-24 pb-12 px-4 bg-gray-50">
       <div className="max-w-lg mx-auto text-center">
-        <div className="p-8 rounded-2xl bg-surface-light border border-white/5">
+        <div className="p-8 rounded-2xl bg-white border border-gray-200 shadow-sm">
           <div className="text-6xl mb-4">✅</div>
-          <h2 className="text-2xl font-bold mb-2">Booking Created!</h2>
-          <p className="text-text-secondary mb-6">Your reference number is:</p>
-          <div className="px-6 py-3 rounded-xl bg-primary/10 border border-primary/20 text-primary-light text-xl font-mono font-bold mb-6">
+          <h2 className="text-2xl font-bold mb-2 text-gray-900">Booking Created!</h2>
+          <p className="text-gray-500 mb-6">Your reference number is:</p>
+          <div className="px-6 py-3 rounded-xl bg-primary/5 border border-primary/20 text-primary text-xl font-mono font-bold mb-6">
             {success.referenceNumber}
           </div>
-          <div className="text-sm text-text-secondary space-y-1 mb-6">
-            <p>Activity: {success.activityTitle}</p>
-            <p>Date: {success.bookingDate}</p>
-            <p>Status: <span className="text-secondary">{success.status}</span></p>
+          <div className="text-sm text-gray-500 space-y-1 mb-6">
+            <p>Activity: <span className="text-gray-900">{success.activityTitle}</span></p>
+            <p>Date: <span className="text-gray-900">{success.bookingDate}</span></p>
+            <p>Status: <span className="text-secondary font-medium">{success.status}</span></p>
             <p>Total: <span className="text-secondary font-bold">${success.totalPrice}</span></p>
           </div>
           <div className="flex gap-3 justify-center">
-            <Link to="/bookings" className="px-6 py-2 rounded-lg bg-gradient-to-r from-primary to-primary-light text-white font-medium">View Bookings</Link>
-            <Link to="/activities" className="px-6 py-2 rounded-lg border border-white/10 text-text-secondary hover:text-white">Browse More</Link>
+            <Link to="/bookings" className="px-6 py-2 rounded-lg bg-primary text-white font-medium hover:bg-primary-dark transition-all">View Bookings</Link>
+            <Link to="/activities" className="px-6 py-2 rounded-lg border border-gray-300 text-gray-600 hover:bg-gray-50 transition-all">Browse More</Link>
           </div>
         </div>
       </div>
@@ -71,26 +77,24 @@ export default function BookingPage() {
   );
 
   return (
-    <div className="min-h-screen pt-24 pb-12 px-4">
+    <div className="min-h-screen pt-24 pb-12 px-4 bg-gray-50">
       <div className="max-w-2xl mx-auto">
-        <Link to={`/activities/${activityId}`} className="inline-flex items-center gap-2 text-text-secondary hover:text-white mb-6">← Back</Link>
-        <h1 className="text-3xl font-bold mb-2">Book Activity</h1>
-        <p className="text-text-secondary mb-8">{activity.title}</p>
+        <Link to={`/activities/${activityId}`} className="inline-flex items-center gap-2 text-gray-500 hover:text-gray-900 mb-6 transition-colors">← Back</Link>
+        <h1 className="text-3xl font-bold mb-2 text-gray-900">Book Activity</h1>
+        <p className="text-gray-500 mb-8">{activity.title}</p>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <form onSubmit={handleSubmit} className="md:col-span-2 p-6 rounded-2xl bg-surface-light border border-white/5 space-y-5">
-            {error && <div className="p-3 rounded-lg bg-danger/10 border border-danger/20 text-danger text-sm">{error}</div>}
+          <form onSubmit={handleSubmit} className="md:col-span-2 p-6 rounded-2xl bg-white border border-gray-200 shadow-sm space-y-5">
+            {error && <div className="p-3 rounded-lg bg-red-50 border border-red-200 text-danger text-sm">{error}</div>}
 
             <div>
-              <label className="block text-sm font-medium text-text-secondary mb-1.5">Date *</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">Date *</label>
               <input type="date" required value={form.bookingDate} onChange={e => setForm({ ...form, bookingDate: e.target.value })}
-                min={new Date().toISOString().split('T')[0]}
-                className="w-full px-4 py-2.5 rounded-lg bg-surface border border-white/10 text-white outline-none focus:border-primary-light transition-all" />
+                min={new Date().toISOString().split('T')[0]} className={inputClass} />
             </div>
             <div>
-              <label className="block text-sm font-medium text-text-secondary mb-1.5">Preferred Time Slot</label>
-              <select value={form.timeSlot} onChange={e => setForm({ ...form, timeSlot: e.target.value })}
-                className="w-full px-4 py-2.5 rounded-lg bg-surface border border-white/10 text-white outline-none focus:border-primary-light transition-all">
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">Preferred Time Slot</label>
+              <select value={form.timeSlot} onChange={e => setForm({ ...form, timeSlot: e.target.value })} className={inputClass}>
                 <option value="">Any time</option>
                 <option value="Morning (8AM-12PM)">Morning (8AM-12PM)</option>
                 <option value="Afternoon (12PM-4PM)">Afternoon (12PM-4PM)</option>
@@ -98,32 +102,31 @@ export default function BookingPage() {
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-text-secondary mb-1.5">Participants *</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">Participants *</label>
               <input type="number" required min="1" max={activity.maxParticipants || 100}
                 value={form.numParticipants} onChange={e => setForm({ ...form, numParticipants: e.target.value })}
-                className="w-full px-4 py-2.5 rounded-lg bg-surface border border-white/10 text-white outline-none focus:border-primary-light transition-all" />
+                className={inputClass} />
             </div>
             <div>
-              <label className="block text-sm font-medium text-text-secondary mb-1.5">Notes</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">Notes</label>
               <textarea value={form.notes} onChange={e => setForm({ ...form, notes: e.target.value })} rows={3}
-                className="w-full px-4 py-2.5 rounded-lg bg-surface border border-white/10 text-white outline-none focus:border-primary-light transition-all resize-none"
-                placeholder="Any special requirements?" />
+                className={inputClass + ' resize-none'} placeholder="Any special requirements?" />
             </div>
             <button type="submit" disabled={loading}
-              className="w-full py-3 rounded-lg bg-gradient-to-r from-primary to-primary-light text-white font-semibold hover:shadow-lg transition-all disabled:opacity-50">
+              className="w-full py-3 rounded-lg bg-primary text-white font-semibold hover:bg-primary-dark transition-all disabled:opacity-50">
               {loading ? 'Creating...' : 'Confirm Booking'}
             </button>
           </form>
 
           {/* Summary */}
-          <div className="p-5 rounded-2xl bg-surface-light border border-white/5 h-fit sticky top-24">
-            <h3 className="font-semibold mb-4">Summary</h3>
+          <div className="p-5 rounded-2xl bg-white border border-gray-200 shadow-sm h-fit sticky top-24">
+            <h3 className="font-semibold mb-4 text-gray-900">Summary</h3>
             <div className="space-y-2 text-sm">
-              <div className="flex justify-between"><span className="text-text-secondary">Activity</span><span>{activity.title}</span></div>
-              <div className="flex justify-between"><span className="text-text-secondary">Price/person</span><span>${activity.price}</span></div>
-              <div className="flex justify-between"><span className="text-text-secondary">Participants</span><span>{form.numParticipants}</span></div>
-              <hr className="border-white/5" />
-              <div className="flex justify-between text-lg font-bold"><span>Total</span><span className="text-secondary">${totalPrice.toFixed(2)}</span></div>
+              <div className="flex justify-between"><span className="text-gray-500">Activity</span><span className="text-gray-900">{activity.title}</span></div>
+              <div className="flex justify-between"><span className="text-gray-500">Price/person</span><span className="text-gray-900">${activity.price}</span></div>
+              <div className="flex justify-between"><span className="text-gray-500">Participants</span><span className="text-gray-900">{form.numParticipants}</span></div>
+              <hr className="border-gray-100" />
+              <div className="flex justify-between text-lg font-bold"><span className="text-gray-900">Total</span><span className="text-secondary">${totalPrice.toFixed(2)}</span></div>
             </div>
           </div>
         </div>

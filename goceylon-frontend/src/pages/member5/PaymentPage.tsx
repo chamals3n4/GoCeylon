@@ -33,7 +33,7 @@ export default function PaymentPage() {
     if (form.paymentMethod === 'CREDIT_CARD' || form.paymentMethod === 'DEBIT_CARD') {
       const cardClean = form.cardNumber.replace(/\s+/g, '');
       if (!/^\d{16}$/.test(cardClean)) {
-        setError('Card number must be 16 digits'); //validations
+        setError('Card number must be 16 digits');
         setLoading(false);
         return;
       }
@@ -67,47 +67,47 @@ export default function PaymentPage() {
     } finally { setLoading(false); }
   };
 
-  if (!booking) return <div className="min-h-screen flex items-center justify-center"><div className="w-8 h-8 border-2 border-primary-light border-t-transparent rounded-full animate-spin" /></div>;
+  const inputClass = "w-full px-4 py-2.5 rounded-lg bg-white border border-gray-300 text-gray-900 placeholder-gray-400 outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all";
+
+  if (!booking) return (
+    <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+    </div>
+  );
 
   if (payment) return (
-    <div className="min-h-screen pt-24 pb-12 px-4">
+    <div className="min-h-screen pt-24 pb-12 px-4 bg-gray-50">
       <div className="max-w-lg mx-auto text-center">
-        <div className="p-8 rounded-2xl bg-surface-light border border-white/5">
+        <div className="p-8 rounded-2xl bg-white border border-gray-200 shadow-sm">
           <div className="text-6xl mb-4">💳</div>
           <h2 className="text-2xl font-bold mb-2 text-success">Payment Successful!</h2>
           <div className="space-y-2 text-sm my-6">
-            <p className="text-text-secondary">Transaction: <span className="text-white font-mono">{payment.transactionId}</span></p>
-            <p className="text-text-secondary">Amount: <span className="text-secondary font-bold text-lg">${payment.amount}</span></p>
-            <p className="text-text-secondary">Booking: <span className="text-white">{payment.bookingReference}</span></p>
-            <p className="text-text-secondary">Method: <span className="text-white">{payment.paymentMethod.replace('_', ' ')}</span></p>
+            <p className="text-gray-500">Transaction: <span className="text-gray-900 font-mono">{payment.transactionId}</span></p>
+            <p className="text-gray-500">Amount: <span className="text-secondary font-bold text-lg">${payment.amount}</span></p>
+            <p className="text-gray-500">Booking: <span className="text-gray-900">{payment.bookingReference}</span></p>
+            <p className="text-gray-500">Method: <span className="text-gray-900">{payment.paymentMethod.replace('_', ' ')}</span></p>
           </div>
           <div className="flex gap-3 justify-center">
-            <Link to="/transactions" className="px-6 py-2 rounded-lg bg-gradient-to-r from-primary to-primary-light text-white font-medium">View Transactions</Link>
-            <Link to="/bookings" className="px-6 py-2 rounded-lg border border-white/10 text-text-secondary hover:text-white">My Bookings</Link>
+            <Link to="/transactions" className="px-6 py-2 rounded-lg bg-primary text-white font-medium hover:bg-primary-dark transition-all">View Transactions</Link>
+            <Link to="/bookings" className="px-6 py-2 rounded-lg border border-gray-300 text-gray-600 hover:bg-gray-50 transition-all">My Bookings</Link>
           </div>
         </div>
       </div>
     </div>
   );
 
-  const inputClass = "w-full px-4 py-2.5 rounded-lg bg-surface border border-white/10 text-white outline-none focus:border-primary-light transition-all";
-
   return (
-    <div className="min-h-screen pt-24 pb-12 px-4">
+    <div className="min-h-screen pt-24 pb-12 px-4 bg-gray-50">
       <div className="max-w-2xl mx-auto">
-        <h1 className="text-3xl font-bold mb-2">Payment</h1>
-        <p className="text-text-secondary mb-8">Complete your booking for {booking.activityTitle}</p>
+        <h1 className="text-3xl font-bold mb-2 text-gray-900">Payment</h1>
+        <p className="text-gray-500 mb-8">Complete your booking for {booking.activityTitle}</p>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <form onSubmit={handleSubmit} autoComplete="off" className="md:col-span-2 p-6 rounded-2xl bg-surface-light border border-white/5 space-y-5">
-            {error && <div className="p-3 rounded-lg bg-danger/10 border border-danger/20 text-danger text-sm">{error}</div>}
-
-            <div >
-              
-            </div>
+          <form onSubmit={handleSubmit} autoComplete="off" className="md:col-span-2 p-6 rounded-2xl bg-white border border-gray-200 shadow-sm space-y-5">
+            {error && <div className="p-3 rounded-lg bg-red-50 border border-red-200 text-danger text-sm">{error}</div>}
 
             <div>
-              <label className="block text-sm font-medium text-text-secondary mb-1.5">Payment Method</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">Payment Method</label>
               <select value={form.paymentMethod} onChange={e => setForm({ ...form, paymentMethod: e.target.value })} className={inputClass}>
                 <option value="CREDIT_CARD">💳 Credit Card</option>
                 <option value="DEBIT_CARD">💳 Debit Card</option>
@@ -117,39 +117,39 @@ export default function PaymentPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-text-secondary mb-1.5">Card Number</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">Card Number</label>
               <input type="text" value={form.cardNumber} onChange={e => setForm({ ...form, cardNumber: e.target.value })} className={inputClass} placeholder="4242 4242 4242 4242" autoComplete="off" />
             </div>
             <div>
-              <label className="block text-sm font-medium text-text-secondary mb-1.5">Card Holder</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">Card Holder</label>
               <input type="text" value={form.cardHolderName} onChange={e => setForm({ ...form, cardHolderName: e.target.value })} className={inputClass} placeholder="John Doe" autoComplete="off" />
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-text-secondary mb-1.5">Expiry</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">Expiry</label>
                 <input type="text" value={form.expiryDate} onChange={e => setForm({ ...form, expiryDate: e.target.value })} className={inputClass} placeholder="MM/YY" autoComplete="off" />
               </div>
               <div>
-                <label className="block text-sm font-medium text-text-secondary mb-1.5">CVV</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">CVV</label>
                 <input type="text" value={form.cvv} onChange={e => setForm({ ...form, cvv: e.target.value })} className={inputClass} placeholder="123" autoComplete="off" />
               </div>
             </div>
 
             <button type="submit" disabled={loading}
-              className="w-full py-3 rounded-lg bg-gradient-to-r from-secondary to-secondary-light text-surface font-semibold hover:shadow-lg hover:shadow-secondary/25 transition-all disabled:opacity-50">
+              className="w-full py-3 rounded-lg bg-secondary text-white font-semibold hover:bg-amber-600 transition-all disabled:opacity-50">
               {loading ? 'Processing...' : `Pay $${booking.totalPrice}`}
             </button>
           </form>
 
-          <div className="p-5 rounded-2xl bg-surface-light border border-white/5 h-fit">
-            <h3 className="font-semibold mb-4">Order Summary</h3>
+          <div className="p-5 rounded-2xl bg-white border border-gray-200 shadow-sm h-fit">
+            <h3 className="font-semibold mb-4 text-gray-900">Order Summary</h3>
             <div className="space-y-2 text-sm">
-              <div className="flex justify-between"><span className="text-text-secondary">Booking</span><span className="font-mono text-xs">{booking.referenceNumber}</span></div>
-              <div className="flex justify-between"><span className="text-text-secondary">Activity</span><span>{booking.activityTitle}</span></div>
-              <div className="flex justify-between"><span className="text-text-secondary">Date</span><span>{booking.bookingDate}</span></div>
-              <div className="flex justify-between"><span className="text-text-secondary">Participants</span><span>{booking.numParticipants}</span></div>
-              <hr className="border-white/5" />
-              <div className="flex justify-between text-lg font-bold"><span>Total</span><span className="text-secondary">${booking.totalPrice}</span></div>
+              <div className="flex justify-between"><span className="text-gray-500">Booking</span><span className="font-mono text-xs text-gray-900">{booking.referenceNumber}</span></div>
+              <div className="flex justify-between"><span className="text-gray-500">Activity</span><span className="text-gray-900">{booking.activityTitle}</span></div>
+              <div className="flex justify-between"><span className="text-gray-500">Date</span><span className="text-gray-900">{booking.bookingDate}</span></div>
+              <div className="flex justify-between"><span className="text-gray-500">Participants</span><span className="text-gray-900">{booking.numParticipants}</span></div>
+              <hr className="border-gray-100" />
+              <div className="flex justify-between text-lg font-bold"><span className="text-gray-900">Total</span><span className="text-secondary">${booking.totalPrice}</span></div>
             </div>
           </div>
         </div>

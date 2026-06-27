@@ -30,51 +30,55 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4 py-20">
-      <div className="w-full max-w-md">
-        <div className="text-center mb-8">
-          <Link to="/" className="inline-flex items-center gap-2 mb-6">
-            <span className="text-3xl">🌴</span>
-            <span className="text-2xl font-bold bg-gradient-to-r from-primary-light to-secondary bg-clip-text text-transparent">GoCeylon</span>
-          </Link>
-          <h1 className="text-2xl font-bold">Welcome Back</h1>
-          <p className="text-text-secondary mt-2">Sign in to your account</p>
+    <div className="min-h-screen flex items-center justify-center bg-white px-4 pt-20">
+      <div className="w-full max-w-[380px]">
+
+        {/* Heading */}
+        <div className="mb-8">
+          <h1 className="text-2xl font-bold text-gray-900 mb-1">Sign in</h1>
+          <p className="text-sm text-gray-400">Welcome back — enter your details below</p>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-8 rounded-2xl bg-surface-light border border-white/5 space-y-5">
+        {/* Form */}
+        <form onSubmit={handleSubmit} className="space-y-4">
           {error && (
-            <div className="p-3 rounded-lg bg-danger/10 border border-danger/20 text-danger text-sm">{error}</div>
+            <div className="px-4 py-3 rounded-xl bg-red-50 border border-red-100 text-danger text-sm">
+              {error}
+            </div>
           )}
 
           <div>
-            <label className="block text-sm font-medium text-text-secondary mb-1.5">Email</label>
-            <input id="login-email" type="email" required value={form.email}
-              onChange={e => setForm({ ...form, email: e.target.value })}
-              className="w-full px-4 py-2.5 rounded-lg bg-surface border border-white/10 text-white placeholder-text-secondary/50
-                       focus:border-primary-light focus:ring-1 focus:ring-primary-light/50 outline-none transition-all"
-              placeholder="you@example.com" />
+            <label className="block text-sm font-medium text-gray-700 mb-1.5">Email</label>
+            <input
+              id="login-email" type="email" required
+              value={form.email} onChange={e => setForm({ ...form, email: e.target.value })}
+              placeholder="you@example.com"
+              className="w-full px-4 py-2.5 rounded-xl border border-gray-300 text-gray-900 text-sm placeholder-gray-400 outline-none focus:border-primary focus:ring-2 focus:ring-primary/10 transition-all bg-gray-100" />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-text-secondary mb-1.5">Password</label>
-            <input id="login-password" type="password" required value={form.password}
-              onChange={e => setForm({ ...form, password: e.target.value })}
-              className="w-full px-4 py-2.5 rounded-lg bg-surface border border-white/10 text-white placeholder-text-secondary/50
-                       focus:border-primary-light focus:ring-1 focus:ring-primary-light/50 outline-none transition-all"
-              placeholder="••••••••" />
+            <label className="block text-sm font-medium text-gray-700 mb-1.5">Password</label>
+            <input
+              id="login-password" type="password" required
+              value={form.password} onChange={e => setForm({ ...form, password: e.target.value })}
+              placeholder="••••••••"
+              className="w-full px-4 py-2.5 rounded-xl border border-gray-300 text-gray-900 text-sm placeholder-gray-400 outline-none focus:border-primary focus:ring-2 focus:ring-primary/10 transition-all bg-gray-100" />
           </div>
 
-          <button id="login-submit" type="submit" disabled={loading}
-            className="w-full py-3 rounded-lg bg-gradient-to-r from-primary to-primary-light text-white font-semibold
-                     hover:shadow-lg hover:shadow-primary/25 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed">
-            {loading ? 'Signing in...' : 'Sign In'}
+          <button
+            id="login-submit" type="submit" disabled={loading}
+            className="w-full py-2.5 rounded-xl bg-primary text-white font-semibold text-sm hover:bg-primary-dark transition-all disabled:opacity-50 disabled:cursor-not-allowed mt-2">
+            {loading ? 'Signing in…' : 'Sign in'}
           </button>
-
-          <p className="text-center text-sm text-text-secondary">
-            Don't have an account?{' '}
-            <Link to="/register" className="text-primary-light hover:underline">Sign up</Link>
-          </p>
         </form>
+
+        {/* Footer */}
+        <p className="mt-6 text-sm text-gray-400 text-center">
+          Don't have an account?{' '}
+          <Link to="/register" className="text-gray-700 font-medium hover:text-primary transition-colors">
+            Create one
+          </Link>
+        </p>
       </div>
     </div>
   );

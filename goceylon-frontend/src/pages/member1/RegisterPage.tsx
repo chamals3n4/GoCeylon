@@ -20,20 +20,13 @@ export default function RegisterPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
-    
     if (form.firstName.trim().length < 2) { setError('First name must be at least 2 characters'); return; }
     if (form.lastName.trim().length < 2) { setError('Last name must be at least 2 characters'); return; }
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) { setError('Please enter a valid email address with a domain (e.g. user@gmail.com)'); return; }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) { setError('Please enter a valid email address'); return; }
     if (form.password.length < 8) { setError('Password must be at least 8 characters'); return; }
-    
-    if (form.role === 'PROVIDER' && !form.phone) {
-      setError('Phone number is required for Providers');
-      return;
-    }
-    if (form.phone && !/^07\d{8}$/.test(form.phone)) {
-      setError('Phone number must be exactly 10 digits and start with 07');
-      return;
-    }
+    if (form.role === 'PROVIDER' && !form.phone) { setError('Phone number is required for Providers'); return; }
+    if (form.phone && !/^07\d{8}$/.test(form.phone)) { setError('Phone must be 10 digits starting with 07'); return; }
+
     setLoading(true);
     try {
       await register(form);
@@ -50,98 +43,94 @@ export default function RegisterPage() {
     }
   };
 
+  const inputClass = "w-full px-4 py-2.5 rounded-xl border border-gray-300 text-gray-900 text-sm placeholder-gray-400 outline-none focus:border-primary focus:ring-2 focus:ring-primary/10 transition-all bg-gray-100";
+
   return (
-    <div className="min-h-screen flex items-center justify-center px-4 py-20">
-      <div className="w-full max-w-md">
-        <div className="text-center mb-8">
-          <Link to="/" className="inline-flex items-center gap-2 mb-6">
-            <span className="text-3xl">🌴</span>
-            <span className="text-2xl font-bold bg-gradient-to-r from-primary-light to-secondary bg-clip-text text-transparent">GoCeylon</span>
-          </Link>
-          <h1 className="text-2xl font-bold">Create Account</h1>
-          <p className="text-text-secondary mt-2">Join the GoCeylon community</p>
+    <div className="min-h-screen flex flex-col items-center bg-white px-4 pt-28 pb-16">
+      <div className="w-full max-w-[400px]">
+
+        {/* Heading */}
+        <div className="mb-8">
+          <h1 className="text-2xl font-bold text-gray-900 mb-1">Create an account</h1>
+          <p className="text-sm text-gray-400">Join the GoCeylon community today</p>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-8 rounded-2xl bg-surface-light border border-white/5 space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4">
           {error && (
-            <div className="p-3 rounded-lg bg-danger/10 border border-danger/20 text-danger text-sm">{error}</div>
+            <div className="px-4 py-3 rounded-xl bg-red-50 border border-red-100 text-danger text-sm">
+              {error}
+            </div>
           )}
 
-          {/* Role Selection */}
+          {/* Role picker */}
           <div>
-            <label className="block text-sm font-medium text-text-secondary mb-2">I am a</label>
-            <div className="grid grid-cols-2 gap-3">
+            <label className="block text-sm font-medium text-gray-700 mb-2">I am a</label>
+            <div className="grid grid-cols-2 gap-2">
               {(['TOURIST', 'PROVIDER'] as const).map(role => (
                 <button key={role} type="button" onClick={() => setForm({ ...form, role })}
-                  className={`p-3 rounded-lg border text-center transition-all duration-200 ${
+                  className={`py-2.5 rounded-xl border text-sm font-medium transition-all duration-200 ${
                     form.role === role
-                      ? 'border-primary-light bg-primary/10 text-primary-light'
-                      : 'border-white/10 text-text-secondary hover:border-white/20'
+                      ? 'border-primary bg-primary/5 text-primary'
+                      : 'border-gray-200 text-gray-500 hover:border-gray-300 hover:text-gray-700'
                   }`}>
-                  <div className="text-xl mb-1">{role === 'TOURIST' ? '🧳' : '🏠'}</div>
-                  <div className="text-sm font-medium">{role === 'TOURIST' ? 'Tourist' : 'Provider'}</div>
+                  {role === 'TOURIST' ? 'Tourist' : 'Provider'}
                 </button>
               ))}
             </div>
           </div>
 
+          {/* Name row */}
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-sm font-medium text-text-secondary mb-1.5">First Name</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">First Name</label>
               <input id="register-firstName" type="text" required value={form.firstName}
                 onChange={e => setForm({ ...form, firstName: e.target.value })}
-                className="w-full px-4 py-2.5 rounded-lg bg-surface border border-white/10 text-white outline-none
-                         focus:border-primary-light focus:ring-1 focus:ring-primary-light/50 transition-all"
-                placeholder="John" />
+                className={inputClass} placeholder="John" />
             </div>
             <div>
-              <label className="block text-sm font-medium text-text-secondary mb-1.5">Last Name</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">Last Name</label>
               <input id="register-lastName" type="text" required value={form.lastName}
                 onChange={e => setForm({ ...form, lastName: e.target.value })}
-                className="w-full px-4 py-2.5 rounded-lg bg-surface border border-white/10 text-white outline-none
-                         focus:border-primary-light focus:ring-1 focus:ring-primary-light/50 transition-all"
-                placeholder="Doe" />
+                className={inputClass} placeholder="Doe" />
             </div>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-text-secondary mb-1.5">Email</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1.5">Email</label>
             <input id="register-email" type="email" required value={form.email}
               onChange={e => setForm({ ...form, email: e.target.value })}
-              className="w-full px-4 py-2.5 rounded-lg bg-surface border border-white/10 text-white outline-none
-                       focus:border-primary-light focus:ring-1 focus:ring-primary-light/50 transition-all"
-              placeholder="you@example.com" />
+              className={inputClass} placeholder="you@example.com" />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-text-secondary mb-1.5">Password</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1.5">Password</label>
             <input id="register-password" type="password" required value={form.password}
               onChange={e => setForm({ ...form, password: e.target.value })}
-              className="w-full px-4 py-2.5 rounded-lg bg-surface border border-white/10 text-white outline-none
-                       focus:border-primary-light focus:ring-1 focus:ring-primary-light/50 transition-all"
-              placeholder="Min 8 chars, uppercase, lowercase, digit, special" />
+              className={inputClass} placeholder="Min 8 chars, use @ ! $ % & as special char" />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-text-secondary mb-1.5">Phone {form.role === 'PROVIDER' ? '*' : '(Optional)'}</label>
-            <input id="register-phone" type="tel" value={form.phone} required={form.role === 'PROVIDER'}
+            <label className="block text-sm font-medium text-gray-700 mb-1.5">
+              Phone {form.role === 'PROVIDER' ? <span className="text-danger">*</span> : <span className="text-gray-400 font-normal">(optional)</span>}
+            </label>
+            <input id="register-phone" type="tel" value={form.phone}
+              required={form.role === 'PROVIDER'}
               onChange={e => setForm({ ...form, phone: e.target.value })}
-              className="w-full px-4 py-2.5 rounded-lg bg-surface border border-white/10 text-white outline-none
-                       focus:border-primary-light focus:ring-1 focus:ring-primary-light/50 transition-all"
-              placeholder="07X XXX XXXX" />
+              className={inputClass} placeholder="07X XXX XXXX" />
           </div>
 
           <button id="register-submit" type="submit" disabled={loading}
-            className="w-full py-3 rounded-lg bg-gradient-to-r from-primary to-primary-light text-white font-semibold
-                     hover:shadow-lg hover:shadow-primary/25 transition-all duration-300 disabled:opacity-50">
-            {loading ? 'Creating account...' : 'Create Account'}
+            className="w-full py-2.5 rounded-xl bg-primary text-white font-semibold text-sm hover:bg-primary-dark transition-all disabled:opacity-50 mt-2">
+            {loading ? 'Creating account…' : 'Create account'}
           </button>
-
-          <p className="text-center text-sm text-text-secondary">
-            Already have an account?{' '}
-            <Link to="/login" className="text-primary-light hover:underline">Sign in</Link>
-          </p>
         </form>
+
+        <p className="mt-6 text-sm text-gray-400 text-center">
+          Already have an account?{' '}
+          <Link to="/login" className="text-gray-700 font-medium hover:text-primary transition-colors">
+            Sign in
+          </Link>
+        </p>
       </div>
     </div>
   );
