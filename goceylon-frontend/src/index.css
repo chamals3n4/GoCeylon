@@ -18,9 +18,15 @@
   --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
 }
 
+@keyframes carousel-scroll {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
 @layer utilities {
   .no-scrollbar::-webkit-scrollbar { display: none; }
   .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+  .animate-carousel { animation: carousel-scroll 32s linear infinite; }
 }
 
 @layer base {

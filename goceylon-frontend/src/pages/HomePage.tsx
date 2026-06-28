@@ -2,6 +2,12 @@ import { Link } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import api from '../api/axios';
 import { Activity, Event as GCEvent, ApiResponse } from '../types';
+import img1 from '../assets/images/img1.jpg';
+import img2 from '../assets/images/img2.jpg';
+import img3 from '../assets/images/img3.jpg';
+import img4 from '../assets/images/img4.jpg';
+import img5 from '../assets/images/img5.webp';
+import img6 from '../assets/images/img6.jpg';
 
 const HERO_CARDS = [
   { key: 'CULTURAL',    emoji: '🎭', label: 'Cultural Tours',  bg: 'bg-orange-50',  border: 'border-orange-100',  hover: 'hover:border-orange-400',  text: 'text-orange-800'  },
@@ -12,12 +18,25 @@ const HERO_CARDS = [
   { key: 'WELLNESS',    emoji: '🧘', label: 'Wellness',        bg: 'bg-violet-50',  border: 'border-violet-100',  hover: 'hover:border-violet-400',  text: 'text-violet-800'  },
 ];
 
+// Duplicate slides so the CSS animation can loop from the end of copy-1 back to the start of copy-1 seamlessly
+
 const CATEGORY_EMOJI: Record<string, string> = {
   CULTURAL: '🎭', ADVENTURE: '🏔️', CULINARY: '🍲', NATURE: '🌿',
   CRAFT: '🎨', WELLNESS: '🧘', WATER_SPORTS: '🏄', WILDLIFE: '🐘', HERITAGE: '🏛️',
 };
 
 const CARD_BG = ['bg-orange-50', 'bg-sky-50', 'bg-emerald-50', 'bg-violet-50', 'bg-amber-50', 'bg-rose-50'];
+
+const CAROUSEL_SLIDES = [
+  { src: img1 },
+  { src: img2 },
+  { src: img3 },
+  { src: img4 },
+  { src: img5 },
+  { src: img6 },
+];
+
+const SLIDES_LOOP = [...CAROUSEL_SLIDES, ...CAROUSEL_SLIDES];
 
 export default function HomePage() {
   const [activities, setActivities] = useState<Activity[]>([]);
@@ -35,7 +54,7 @@ export default function HomePage() {
       <section className="bg-white overflow-hidden">
 
         {/* Centered copy block */}
-        <div className="max-w-3xl mx-auto px-6 pt-28 pb-14 text-center">
+        <div className="max-w-3xl mx-auto px-6 pt-28 pb-10 text-center">
           <h1 className="text-[52px] sm:text-[68px] lg:text-[76px] font-black leading-[1.04] tracking-tight mb-6">
             <span className="text-gray-900">Discover Authentic</span><br />
             <span className="text-primary">Sri Lanka</span>
@@ -54,7 +73,25 @@ export default function HomePage() {
               View Map
             </Link>
           </div>
+        </div>
 
+        {/* ── Continuous auto-scroll carousel ── */}
+        <div className="overflow-hidden pb-10">
+          <div className="flex animate-carousel" style={{ width: 'max-content' }}>
+            {SLIDES_LOOP.map((slide, i) => (
+              <div
+                key={i}
+                className="flex-shrink-0 w-[420px] sm:w-[480px] h-[260px] sm:h-[300px] rounded-2xl overflow-hidden mr-4"
+              >
+                <img
+                  src={slide.src}
+                  alt=""
+                  className="w-full h-full object-cover"
+                  draggable={false}
+                />
+              </div>
+            ))}
+          </div>
         </div>
 
         {/* Category card row — landscape, flush to section bottom */}
